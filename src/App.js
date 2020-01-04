@@ -19,7 +19,6 @@ import {
 import SafeAreaContext from 'react-native-safe-area-context';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { LoremIpsum } from "lorem-ipsum";
-import ViewPager from '@react-native-community/viewpager';
 
 const { height, width } = Dimensions.get('window');
 
