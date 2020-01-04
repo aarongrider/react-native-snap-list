@@ -14,6 +14,7 @@
     "react": "16.9.0",
     "react-native": "0.61.5",
     "react-native-haptic-feedback": "^1.8.2",
+    "react-native-nested-scroll-view": "^9.0.0",
     "react-native-safe-area-context": "^0.6.1"
   },
   "devDependencies": {

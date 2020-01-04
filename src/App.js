@@ -13,12 +13,14 @@ import {
   View,
   Text,
   Dimensions,
-  FlatList,
+  FlatList
 } from 'react-native';
+import NestedScrollView from 'react-native-nested-scroll-view';
 
 import SafeAreaContext from 'react-native-safe-area-context';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { LoremIpsum } from "lorem-ipsum";
+import ViewPagerAndroid from '@react-native-community/viewpager'
 
 const { height, width } = Dimensions.get('window');
 
@@ -63,29 +65,15 @@ export default class App extends Component {
     //SafeAreaContext.
   }
 
-  _renderSeparator = () => {
-    return (
-      <View style={{ backgroundColor: 'red' }}>
-        <Text style={{ flex: 1, fontSize: 42, textAlign: 'center' }}>Section Header</Text>
-      </View>
-    )
-  }
-
-  _isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
-    const paddingToBottom = 20;
-    return layoutMeasurement.height + contentOffset.y >=
-      contentSize.height - paddingToBottom;
-  }
-
   _renderItem = ({ item, index, separators }) => {
     return (
-      <ScrollView
+      <NestedScrollView
         height={height}
         scrollEnabled={true}
         style={styles.scrollView}>
         <Text style={{ fontSize: 42, textAlign: 'center', paddingBottom: 16 }}>{item.key}</Text>
         <Text style={{ fontSize: 16, lineHeight: 30 }}>{lorem.generateParagraphs(10)}</Text>
-      </ScrollView >
+      </NestedScrollView >
     )
   }
 
@@ -93,7 +81,7 @@ export default class App extends Component {
     return (
       <>
         <FlatList
-          scrollEnabled={false}
+          scrollEnabled={true}
           pagingEnabled={true}
           horizontal={false}
           onViewableItemsChanged={this._onIndexChanged}

@@ -5035,6 +5035,11 @@ react-native-haptic-feedback@^1.8.2:
   resolved "https://registry.yarnpkg.com/react-native-haptic-feedback/-/react-native-haptic-feedback-1.8.2.tgz#532dfcdfe2eaaaf3c30ff5dff97973ff05399fcd"
   integrity sha512-arY2vsQtcF6Z/HggcfASTFzXm5HLUvK08rj6xPs6b95mpUDyStxEoC2c6MCFx+GSqnpBuOQvQCf42Zp0ATnWoQ==
 
+react-native-nested-scroll-view@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-nested-scroll-view/-/react-native-nested-scroll-view-9.0.0.tgz#c9afd2678be84f1707186abb510543b56f94f9ef"
+  integrity sha512-I7c/so7RaLbeZaJKAcZPYqyN8LTA9K5PtyUE7p17lXIs4/KLEkzej8YOa5KzDxSiX7RWKPmqlfxgcqkx50hX/Q==
+
 react-native-safe-area-context@^0.6.1:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-0.6.2.tgz#d467ac8a953426bfbb6d8f417222b0dc3952be7a"
