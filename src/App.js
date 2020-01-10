@@ -15,6 +15,7 @@ import {
   Dimensions,
   FlatList,
   SafeAreaView,
+  Animated
 } from 'react-native';
 import { LoremIpsum } from "lorem-ipsum";
 
@@ -59,6 +60,7 @@ export default class App extends Component {
   flatList = React.createRef();
 
   state = {
+    scrollAnim: new Animated.Value(0),
     height: 0
   }
 
@@ -96,12 +98,26 @@ export default class App extends Component {
     contentSize: { width: 414, height: 2346.5 }
     */
 
-    //console.log(event.nativeEvent.contentOffset.y)
+    const atBottom = event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y >= event.nativeEvent.contentSize.height - 30;
+    console.log(atBottom)
+    if (atBottom) {
+      console.log("close to bottom")
+      console.log("Content offset:" + event.nativeEvent.contentOffset.y)
+      console.log("Content size:" + event.nativeEvent.contentSize.height)
+      console.log("layout height:" + event.nativeEvent.layoutMeasurement.height)
+      const offset = (event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y) - event.nativeEvent.contentSize.height;
+      console.log(offset)
+      this.flatList.current.scrollToOffset({ offset: offset, animated: false })
+    }
   }
 
   _renderItem = ({ item, index, separators }) => {
     return (
-      <ScrollView scrollEnabled={true} height={this.state.height}>
+      <ScrollView
+        scrollEventThrottle={1}
+        onScroll={event => { this._onScroll(event) }}
+        height={this.state.height}
+        scrollEnabled={true}>
         <View style={{ padding: 50 }}>
           <Text style={{ fontSize: 42, textAlign: 'center', paddingBottom: 16 }}>{item.key}</Text>
           <Text style={{ fontSize: 16, lineHeight: 30 }}>{item.value}</Text>
@@ -115,6 +131,15 @@ export default class App extends Component {
     if (layoutHeight && layoutHeight != this.state.height) {
       this.setState({ height: layoutHeight });
     }
+  }
+
+  componentDidMount() {
+    /*
+    this.state.scrollAnim.addListener(({ value }) => {
+      console.log('onscroll')
+      this.flatList.current.scrollToOffset({ offset: value, animated: false })
+    });
+    */
   }
 
   render() {
