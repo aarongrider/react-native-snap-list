@@ -8,13 +8,13 @@
 
 import React, { Component } from 'react';
 import {
+  View,
   StyleSheet,
   ScrollView,
-  View,
   Text,
   Dimensions,
   FlatList,
-  Platform,
+  SafeAreaView,
 } from 'react-native';
 import { LoremIpsum } from "lorem-ipsum";
 
@@ -33,19 +33,24 @@ const lorem = new LoremIpsum({
 
 const DATA = [
   {
-    key: '1'
+    key: '1',
+    value: lorem.generateParagraphs(10)
   },
   {
-    key: '2'
+    key: '2',
+    value: lorem.generateParagraphs(5)
   },
   {
-    key: '3'
+    key: '3',
+    value: lorem.generateParagraphs(3)
   },
   {
-    key: '4'
+    key: '4',
+    value: lorem.generateParagraphs(1)
   },
   {
-    key: '5'
+    key: '5',
+    value: lorem.generateParagraphs(7)
   }
 ]
 
@@ -54,7 +59,7 @@ export default class App extends Component {
   flatList = React.createRef();
 
   state = {
-    flatListScrollEnabled: false
+    height: 0
   }
 
   constructor() {
@@ -62,7 +67,7 @@ export default class App extends Component {
   }
 
   _onIndexChanged = () => {
-    console.log("Index: ")
+    //console.log("Index: ")
     //ReactNativeHapticFeedback.trigger("impactLight");
     //SafeAreaContext.
   }
@@ -96,58 +101,43 @@ export default class App extends Component {
 
   _renderItem = ({ item, index, separators }) => {
     return (
-      <ScrollView
-        height={height}
-        nestedScrollEnabled={true}>
-        <Text style={{ fontSize: 42, textAlign: 'center', paddingBottom: 16 }}>{item.key}</Text>
-        <Text style={{ fontSize: 16, lineHeight: 30 }}>{lorem.generateParagraphs(10)}</Text>
+      <ScrollView scrollEnabled={true} height={this.state.height}>
+        <View style={{ padding: 50 }}>
+          <Text style={{ fontSize: 42, textAlign: 'center', paddingBottom: 16 }}>{item.key}</Text>
+          <Text style={{ fontSize: 16, lineHeight: 30 }}>{item.value}</Text>
+        </View>
       </ScrollView>
     )
   }
 
-  _renderItemAndroid = ({ item, index, separators }) => {
-    return (
-      <View style={{flex: 1}}>
-        <Text style={{ fontSize: 42, textAlign: 'center', paddingBottom: 16 }}>{item.key}</Text>
-        <Text style={{ fontSize: 16, lineHeight: 30 }}>{lorem.generateParagraphs(10)}</Text>
-      </View>
-    )
-  }
-
-  _renderiOS() {
-    return (
-      <FlatList
-        ref={this.flatList}
-        pagingEnabled={true}
-        horizontal={false}
-        onViewableItemsChanged={this._onIndexChanged}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        data={DATA}
-        renderItem={this._renderItem}
-      />
-    );
-  }
-
-  _renderAndroid() {
-    return (
-      <FlatList
-        ref={this.flatList}
-        snapToAlignment='start'
-        horizontal={false}
-        onViewableItemsChanged={this._onIndexChanged}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        data={DATA}
-        onEndReached={this._onEndReached}
-        renderItem={this._renderItemAndroid}
-      />
-    );
+  _onLayout = (event) => {
+    const layoutHeight = event.nativeEvent.layout.height
+    if (layoutHeight && layoutHeight != this.state.height) {
+      this.setState({ height: layoutHeight });
+    }
   }
 
   render() {
-    if (Platform.OS == 'ios') return this._renderiOS();
-    else return this._renderAndroid();
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1 }} onLayout={this._onLayout}>
+          <FlatList
+            style={{ flex: 1 }}
+            ref={this.flatList}
+            extraData={this.state.height}
+            onLayout={this._onFlatListLayout}
+            scrollEnabled={false}
+            pagingEnabled={true}
+            horizontal={false}
+            onViewableItemsChanged={this._onIndexChanged}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            data={DATA}
+            renderItem={this._renderItem}
+          />
+        </View>
+      </SafeAreaView>
+    );
   }
 }
 
