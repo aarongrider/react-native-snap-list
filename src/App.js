@@ -89,6 +89,11 @@ export default class App extends Component {
     }
   };
 
+  _onScrollBegin = (event) => {
+    console.log('_onScrollBegin')
+    this._onScroll(event)
+  }
+
   _onScrollEndDrag = (e) => {
     console.log("_onScrollEndDrag")
 
@@ -108,12 +113,13 @@ export default class App extends Component {
   }
 
   _onScroll = (event) => {
+    console.log('onscroll')
     const layoutHeight = event.nativeEvent.layoutMeasurement.height
     const contentHeight = event.nativeEvent.contentSize.height
 
-    console.log("Content offset:" + event.nativeEvent.contentOffset.y)
-    console.log("Content size:" + event.nativeEvent.contentSize.height)
-    console.log("layout height:" + event.nativeEvent.layoutMeasurement.height)
+    //console.log("Content offset:" + event.nativeEvent.contentOffset.y)
+    //console.log("Content size:" + event.nativeEvent.contentSize.height)
+    //console.log("layout height:" + event.nativeEvent.layoutMeasurement.height)
 
     /// Detect scrolling direction
     const currentOffset = event.nativeEvent.contentOffset.y;
@@ -128,17 +134,22 @@ export default class App extends Component {
       scrollDirection = 'down'
     }
 
-    console.log("Scroll Direction: " + scrollDirection)
+    //console.log("Scroll Direction: " + scrollDirection)
     this.offset = currentOffset;
 
     const detectMargin = 50
     const atBottom = event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y >= event.nativeEvent.contentSize.height - detectMargin;
     const atTop = event.nativeEvent.contentOffset.y <= detectMargin;
-    if (atBottom) console.log("atBottom")
-    if (atTop) console.log("atTop")
+    //if (atBottom) console.log("atBottom")
+    //if (atTop) console.log("atTop")
 
+    // if at top and no change in direction
+    if ((atTop || atBottom) && currentOffset == this.offset) {
+      console.log('if at top or bottom and no change in direction')
+      this.setState({ flatListScrollEnabled: true })
+    }
     // if at top and moving up
-    if (atTop && scrollDirection === 'up') {
+    else if (atTop && scrollDirection === 'up') {
       console.log('if at top and moving up')
       this.setState({ flatListScrollEnabled: true })
     }
@@ -154,7 +165,7 @@ export default class App extends Component {
 
   _renderItem = ({ item, index, separators }) => {
     return (
-      <ScrollView scrollEventThrottle={1} onScroll={event => { this._onScroll(event) }} height={this.state.height}>
+      <ScrollView scrollEventThrottle={1} onScrollBeginDrag={event => { this._onScrollBegin(event) }} onScroll={event => { this._onScroll(event) }} height={this.state.height}>
         <View style={{ padding: 50 }}>
           <Text style={{ fontSize: 42, textAlign: 'center', paddingBottom: 16 }}>{item.key}</Text>
           <Text style={{ fontSize: 16, lineHeight: 30 }}>{item.value}</Text>
