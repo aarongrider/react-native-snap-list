@@ -18,6 +18,8 @@ import {
 } from 'react-native';
 import { LoremIpsum } from "lorem-ipsum";
 
+import Toast from 'react-native-simple-toast';
+
 const { height, width } = Dimensions.get('window');
 
 const lorem = new LoremIpsum({
@@ -56,52 +58,103 @@ const DATA = [
 
 export default class App extends Component {
 
+  lastElement = 0;
+  currentElement = 0;
+  offset = 0;
   flatList = React.createRef();
 
   state = {
-    height: 0
+    height: 0,
+    transitioningIndex: false,
+    flatListScrollEnabled: false
   }
 
   constructor() {
     super();
   }
 
-  _onIndexChanged = () => {
-    //console.log("Index: ")
-    //ReactNativeHapticFeedback.trigger("impactLight");
-    //SafeAreaContext.
-  }
+  _onViewableItemsChanged = (info) => {
+    if (info.viewableItems.length > 0) {
+      const firstIndex = info.viewableItems[0].index;
+      const lastIndex = info.viewableItems[info.viewableItems.length - 1].index;
 
-  _onEndReached = () => {
-    console.log("on end reached")
+      if (firstIndex !== this.currentElement) {
+        this.currentElement = firstIndex;
+      }
+      else if (lastIndex !== this.currentElement) {
+        this.currentElement = lastIndex;
+      }
+
+      this._onIndexChanged()
+    }
+  };
+
+  _onScrollEndDrag = (e) => {
+    console.log("_onScrollEndDrag")
+
+    if (this.state.transitioningIndex) {
+      console.log("disable flatlist dragging")
+      this.setState({ flatListScrollEnabled: false })
+    }
+  };
+
+  _onIndexChanged = () => {
+    const index = this.currentElement + 1
+    Toast.show("Index is now: " + index, Toast.SHORT);
+    this.setState({ transitioningIndex: true })
+
+    // TODO: Add haptic feedback
+    //ReactNativeHapticFeedback.trigger("impactLight");
   }
 
   _onScroll = (event) => {
     const layoutHeight = event.nativeEvent.layoutMeasurement.height
     const contentHeight = event.nativeEvent.contentSize.height
-    const viewSize = contentHeight - layoutHeight
-    //console.log("View size: " + viewSize)
 
-    const contentOffset = event.nativeEvent.contentOffset.y
-    //console.log("Content offset: " + contentOffset)
+    console.log("Content offset:" + event.nativeEvent.contentOffset.y)
+    console.log("Content size:" + event.nativeEvent.contentSize.height)
+    console.log("layout height:" + event.nativeEvent.layoutMeasurement.height)
 
-    const diff = contentOffset - viewSize
+    /// Detect scrolling direction
+    const currentOffset = event.nativeEvent.contentOffset.y;
+    const dif = currentOffset - (this.offset || 0);
+    let scrollDirection = 'unclear';
 
-    if (diff >= 0 || diff <= -1) {
-      this.setState({ flatListScrollEnabled: true })
+    if (Math.abs(dif) < 3) {
+      scrollDirection = 'unclear'
+    } else if (dif < 0) {
+      scrollDirection = 'up'
+    } else {
+      scrollDirection = 'down'
     }
 
-    /*
-    layoutMeasurement: { width: 414, height: 896 }
-    contentSize: { width: 414, height: 2346.5 }
-    */
+    console.log("Scroll Direction: " + scrollDirection)
+    this.offset = currentOffset;
 
-    //console.log(event.nativeEvent.contentOffset.y)
+    const detectMargin = 50
+    const atBottom = event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y >= event.nativeEvent.contentSize.height - detectMargin;
+    const atTop = event.nativeEvent.contentOffset.y <= detectMargin;
+    if (atBottom) console.log("atBottom")
+    if (atTop) console.log("atTop")
+
+    // if at top and moving up
+    if (atTop && scrollDirection === 'up') {
+      console.log('if at top and moving up')
+      this.setState({ flatListScrollEnabled: true })
+    }
+    // if at bottom and moving down
+    else if (atBottom && scrollDirection === 'down') {
+      console.log('at bottom and moving down')
+      this.setState({ flatListScrollEnabled: true })
+    }
+    else {
+      this.setState({ flatListScrollEnabled: false })
+    }
   }
 
   _renderItem = ({ item, index, separators }) => {
     return (
-      <ScrollView scrollEnabled={true} height={this.state.height}>
+      <ScrollView scrollEventThrottle={1} onScroll={event => { this._onScroll(event) }} height={this.state.height}>
         <View style={{ padding: 50 }}>
           <Text style={{ fontSize: 42, textAlign: 'center', paddingBottom: 16 }}>{item.key}</Text>
           <Text style={{ fontSize: 16, lineHeight: 30 }}>{item.value}</Text>
@@ -119,14 +172,15 @@ export default class App extends Component {
 
   render() {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={{ flex: 1 }} onLayout={this._onLayout}>
+      <SafeAreaView style={{ backgroundColor: 'gray', flex: 1 }}>
+        <View style={{ backgroundColor: 'white', flex: 1 }} onLayout={this._onLayout}>
           <FlatList
             style={{ flex: 1 }}
             ref={this.flatList}
             extraData={this.state.height}
             onLayout={this._onFlatListLayout}
-            scrollEnabled={false}
+            scrollEnabled={this.state.flatListScrollEnabled}
+            onScrollEndDrag={() => this._onScrollEndDrag()}
             pagingEnabled={true}
             horizontal={false}
             onViewableItemsChanged={this._onIndexChanged}
@@ -134,6 +188,7 @@ export default class App extends Component {
             showsHorizontalScrollIndicator={false}
             data={DATA}
             renderItem={this._renderItem}
+            onViewableItemsChanged={this._onViewableItemsChanged}
           />
         </View>
       </SafeAreaView>
