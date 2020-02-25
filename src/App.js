@@ -166,30 +166,26 @@ export default class App extends Component {
     }
   };
 
-  _renderItem = ({section, row}) => {
-    console.log('row: ', row);
+  _renderItem = ({item, index, separators}) => {
+    return (
+      <ScrollView
+        scrollEventThrottle={1}
+        onScrollBeginDrag={event => {
+          this._onScrollBegin(event);
+        }}
+        onScroll={event => {
+          this._onScroll(event);
+        }}
+        height={this.state.height}>
+        <View style={{padding: 50}}>
+          <Text style={{fontSize: 42, textAlign: 'center', paddingBottom: 16}}>
+            {item.key}
+          </Text>
+          <Text style={{fontSize: 16, lineHeight: 30}}>{item.value}</Text>
+        </View>
+      </ScrollView>
+    );
   };
-
-  // _renderItem = ({item, index, separators}) => {
-  //   return (
-  //     <ScrollView
-  //       scrollEventThrottle={1}
-  //       onScrollBeginDrag={event => {
-  //         this._onScrollBegin(event);
-  //       }}
-  //       onScroll={event => {
-  //         this._onScroll(event);
-  //       }}
-  //       height={this.state.height}>
-  //       <View style={{padding: 50}}>
-  //         <Text style={{fontSize: 42, textAlign: 'center', paddingBottom: 16}}>
-  //           {item.key}
-  //         </Text>
-  //         <Text style={{fontSize: 16, lineHeight: 30}}>{item.value}</Text>
-  //       </View>
-  //     </ScrollView>
-  //   );
-  // };
 
   _onLayout = event => {
     const layoutHeight = event.nativeEvent.layout.height;
