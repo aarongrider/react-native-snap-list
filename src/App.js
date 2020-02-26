@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import React, {Component} from 'react';
 
+import KitModal from './KitModal';
 import {LargeList} from 'react-native-largelist-v3';
 import {LoremIpsum} from 'lorem-ipsum';
 import NestedScrollView from 'react-native-nested-scroll-view';
@@ -282,6 +283,7 @@ export default class App extends Component {
             onViewableItemsChanged={this._onViewableItemsChanged}
           />
         </View>
+        <KitModal />
       </SafeAreaView>
     );
   }

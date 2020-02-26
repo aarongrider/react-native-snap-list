@@ -1,23 +1,18 @@
-import React, { Component, ReactElement } from 'react';
-import styled from 'styled-components/native';
-import {
-  Animated,
-  Dimensions,
-  StyleSheet,
-  Text,
-  View
-  } from 'react-native';
+import {Animated, Dimensions, StyleSheet, Text, View} from 'react-native';
 import {
   NativeViewGestureHandler,
   PanGestureHandler,
   State,
-  TapGestureHandler
-  } from 'react-native-gesture-handler';
+  TapGestureHandler,
+} from 'react-native-gesture-handler';
+import React, {Component, ReactElement} from 'react';
+
+import styled from 'styled-components/native';
 // import { colorForScheme } from '../theming/Theming';
 // import Colors from '../theming/Colors';
 
-const colorForScheme = ({ default }) => default;
-const Colors = {N100: '#ddd'}
+const colorForScheme = ({default: def}) => def;
+const Colors = {N100: '#ddd'};
 
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
@@ -63,19 +58,31 @@ export default class KitModal extends Component<IProps, IState> {
   _lastScrollYValue = 0;
   _lastScrollY = new Animated.Value(0);
 
-  _onRegisterLastScroll = Animated.event([{ nativeEvent: { contentOffset: { y: this._lastScrollY } } }], {
-    useNativeDriver: true,
-  });
+  _onRegisterLastScroll = Animated.event(
+    [{nativeEvent: {contentOffset: {y: this._lastScrollY}}}],
+    {
+      useNativeDriver: true,
+    },
+  );
 
   _dragY = new Animated.Value(0);
-  _onGestureEvent = Animated.event([{ nativeEvent: { translationY: this._dragY } }], {
-    useNativeDriver: true,
-  });
+  _onGestureEvent = Animated.event(
+    [{nativeEvent: {translationY: this._dragY}}],
+    {
+      useNativeDriver: true,
+    },
+  );
 
-  _reverseLastScrollY = Animated.multiply(new Animated.Value(-1), this._lastScrollY);
+  _reverseLastScrollY = Animated.multiply(
+    new Animated.Value(-1),
+    this._lastScrollY,
+  );
 
   _translateYOffset = new Animated.Value(END);
-  _translateY = Animated.add(this._translateYOffset, Animated.add(this._dragY, this._reverseLastScrollY)).interpolate({
+  _translateY = Animated.add(
+    this._translateYOffset,
+    Animated.add(this._dragY, this._reverseLastScrollY),
+  ).interpolate({
     inputRange: [START, END],
     outputRange: [START, END],
     extrapolate: 'clamp',
@@ -85,19 +92,20 @@ export default class KitModal extends Component<IProps, IState> {
   // Methods
   //********************************************************************************
 
-  _onHeaderHandlerStateChange = ({ nativeEvent }: any) => {
+  _onHeaderHandlerStateChange = ({nativeEvent}: any) => {
     if (nativeEvent.oldState === State.BEGAN) {
       this._lastScrollY.setValue(0);
     }
-    this._onHandlerStateChange({ nativeEvent });
+    this._onHandlerStateChange({nativeEvent});
   };
 
-  _onHandlerStateChange = ({ nativeEvent }: any) => {
+  _onHandlerStateChange = ({nativeEvent}: any) => {
     if (nativeEvent.oldState === State.ACTIVE) {
-      let { velocityY, translationY } = nativeEvent;
+      let {velocityY, translationY} = nativeEvent;
       translationY -= this._lastScrollYValue;
       const dragToss = 0.05;
-      const endOffsetY = this.state.lastSnap + translationY + dragToss * velocityY;
+      const endOffsetY =
+        this.state.lastSnap + translationY + dragToss * velocityY;
 
       let destSnapPoint = SNAP_POINTS_FROM_TOP[0];
       for (let i = 0; i < SNAP_POINTS_FROM_TOP.length; i++) {
@@ -107,8 +115,12 @@ export default class KitModal extends Component<IProps, IState> {
           destSnapPoint = snapPoint;
         }
       }
-      this.setState({ lastSnap: destSnapPoint });
-      if (destSnapPoint === this._snapPointsFromTop[this._snapPointsFromTop.length - 1] && this.props.toggleModal)
+      this.setState({lastSnap: destSnapPoint});
+      if (
+        destSnapPoint ===
+          this._snapPointsFromTop[this._snapPointsFromTop.length - 1] &&
+        this.props.toggleModal
+      )
         this.props.toggleModal();
       this._translateYOffset.extractOffset();
       this._translateYOffset.setValue(translationY);
@@ -130,19 +142,20 @@ export default class KitModal extends Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
 
-    this._lastScrollY.addListener(({ value }) => {
+    this._lastScrollY.addListener(({value}) => {
       this._lastScrollYValue = value;
     });
 
-    if (props.snapPointsFromTop) this._snapPointsFromTop = props.snapPointsFromTop;
+    if (props.snapPointsFromTop)
+      this._snapPointsFromTop = props.snapPointsFromTop;
   }
 
-  componentDidUpdate = ({ isVisible }: IProps) => {
+  componentDidUpdate = ({isVisible}: IProps) => {
     if (!isVisible && this.props.isVisible) {
       // Show the modal
       const velocityY = -2800;
       const destSnapPoint = this._snapPointsFromTop[0];
-      this.setState({ lastSnap: destSnapPoint });
+      this.setState({lastSnap: destSnapPoint});
       Animated.spring(this._translateYOffset, {
         velocity: velocityY,
         tension: 68,
@@ -154,23 +167,23 @@ export default class KitModal extends Component<IProps, IState> {
   };
 
   render() {
-    const translateYAnimation = { transform: [{ translateY: this._translateY }] };
-    const { isVisible } = this.props;
+    const translateYAnimation = {transform: [{translateY: this._translateY}]};
+    const {isVisible} = this.props;
     return (
       <TapGestureHandler
         ref={this.masterdrawer}
         maxDurationMs={100000}
-        maxDeltaY={this.state.lastSnap - SNAP_POINTS_FROM_TOP[0]}
-      >
-        <ModalWrapper isVisible={isVisible} pointerEvents='box-none'>
-          <Animated.View style={[StyleSheet.absoluteFillObject, translateYAnimation]} testID='kitModal'>
+        maxDeltaY={this.state.lastSnap - SNAP_POINTS_FROM_TOP[0]}>
+        <ModalWrapper isVisible={isVisible} pointerEvents="box-none">
+          <Animated.View
+            style={[StyleSheet.absoluteFillObject, translateYAnimation]}
+            testID="kitModal">
             <PanGestureHandler
               ref={this.drawerheader}
               simultaneousHandlers={[this.scroll, this.masterdrawer]}
               shouldCancelWhenOutside={false}
               onGestureEvent={this._onGestureEvent}
-              onHandlerStateChange={this._onHeaderHandlerStateChange}
-            >
+              onHandlerStateChange={this._onHeaderHandlerStateChange}>
               <ModalHeader>
                 <Handle />
                 {this.props.header}
@@ -181,20 +194,17 @@ export default class KitModal extends Component<IProps, IState> {
               simultaneousHandlers={[this.scroll, this.masterdrawer]}
               shouldCancelWhenOutside={false}
               onGestureEvent={this._onGestureEvent}
-              onHandlerStateChange={this._onHandlerStateChange}
-            >
-              <Animated.View style={{ flex: 1 }}>
+              onHandlerStateChange={this._onHandlerStateChange}>
+              <Animated.View style={{flex: 1}}>
                 <NativeViewGestureHandler
                   ref={this.scroll}
                   waitFor={this.masterdrawer}
-                  simultaneousHandlers={this.drawer}
-                >
+                  simultaneousHandlers={this.drawer}>
                   <BodyScrollView
-                    style={{ marginBottom: SNAP_POINTS_FROM_TOP[0] }}
+                    style={{marginBottom: SNAP_POINTS_FROM_TOP[0]}}
                     bounces={false}
                     onScrollBeginDrag={this._onRegisterLastScroll}
-                    scrollEventThrottle={1}
-                  >
+                    scrollEventThrottle={1}>
                     {this.props.body}
                   </BodyScrollView>
                 </NativeViewGestureHandler>
@@ -214,12 +224,17 @@ const ModalWrapper = styled.View`
   position: absolute;
   width: ${windowWidth};
   height: ${windowHeight};
-  background-color: rgba(0, 0, 0, ${({ isVisible }: IProps) => (isVisible ? 0.4 : 0)});
+  background-color: rgba(
+    0,
+    0,
+    0,
+    ${({isVisible}: IProps) => (isVisible ? 0.4 : 0)}
+  );
   elevation: 4;
 `;
 
 const ModalHeader = styled(Animated.View)`
-  background-color: ${colorForScheme({ default: Colors.N100})};;
+  background-color: ${colorForScheme({default: Colors.N100})};
   height: 100;
   width: 100%;
   align-items: center;

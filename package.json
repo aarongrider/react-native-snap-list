@@ -20,7 +20,8 @@
     "react-native-nested-scroll-view": "^9.0.0",
     "react-native-safe-area-context": "^0.6.1",
     "react-native-simple-toast": "^1.0.0",
-    "react-native-spring-scrollview": "^2.0.23"
+    "react-native-spring-scrollview": "^2.0.23",
+    "styled-components": "^5.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
