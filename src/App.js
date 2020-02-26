@@ -8,11 +8,11 @@
 
 import {
   Dimensions,
-  FlatList,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
+  FlatList,
   View,
 } from 'react-native';
 import React, {Component} from 'react';
@@ -20,8 +20,10 @@ import React, {Component} from 'react';
 import {LargeList} from 'react-native-largelist-v3';
 import {LoremIpsum} from 'lorem-ipsum';
 import Toast from 'react-native-simple-toast';
+import NestedScrollView from 'react-native-nested-scroll-view';
+import { SpringScrollView } from 'react-native-spring-scrollview';
 
-const {height, width} = Dimensions.get('window');
+const {HEIGHT, WIDTH} = Dimensions.get('window');
 
 const lorem = new LoremIpsum({
   sentencesPerParagraph: {
@@ -115,8 +117,8 @@ export default class App extends Component {
 
   _onScroll = event => {
     console.log('onscroll');
-    const layoutHeight = event.nativeEvent.layoutMeasurement.height;
-    const contentHeight = event.nativeEvent.contentSize.height;
+    //const layoutHeight = event.nativeEvent.layoutMeasurement.height;
+    //const contentHeight = event.nativeEvent.contentSize.height;
 
     //console.log("Content offset:" + event.nativeEvent.contentOffset.y)
     //console.log("Content size:" + event.nativeEvent.contentSize.height)
@@ -138,6 +140,7 @@ export default class App extends Component {
     //console.log("Scroll Direction: " + scrollDirection)
     this.offset = currentOffset;
 
+    /*
     const detectMargin = 50;
     const atBottom =
       event.nativeEvent.layoutMeasurement.height +
@@ -164,11 +167,12 @@ export default class App extends Component {
     } else {
       this.setState({flatListScrollEnabled: false});
     }
+    */
   };
 
   _renderItem = ({item, index, separators}) => {
     return (
-      <ScrollView
+      <SpringScrollView
         scrollEventThrottle={1}
         onScrollBeginDrag={event => {
           this._onScrollBegin(event);
@@ -183,7 +187,7 @@ export default class App extends Component {
           </Text>
           <Text style={{fontSize: 16, lineHeight: 30}}>{item.value}</Text>
         </View>
-      </ScrollView>
+      </SpringScrollView>
     );
   };
 
@@ -194,51 +198,30 @@ export default class App extends Component {
     }
   };
 
-  _renderSection = (section: number) => {
-    return (
-      <View style={styles.section}>
-        <Text>Section {section}</Text>
-      </View>
-    );
-  };
-
   _renderIndexPath = ({section: section, row: row}) => {
-    console.log('render index path');
     return (
-      <View style={styles.row}>
-        <Text>
-          Section {section} Row {row}
-        </Text>
-        <View style={styles.line} />
-      </View>
+      <NestedScrollView>
+        <View style={{padding: 50}}>
+          <Text style={{fontSize: 42, textAlign: 'center', paddingBottom: 16}}>
+            {DATA[row].key}
+          </Text>
+          <Text style={{fontSize: 16, lineHeight: 30}}>{DATA[row].value}</Text>
+        </View>
+      </NestedScrollView>
     );
   };
 
   render() {
-    const blah = [];
-    const sectionCount = 4;
-    const rowCount = 5;
-    for (let section = 0; section < sectionCount; ++section) {
-      const sContent = {items: []};
-      for (let row = 0; row < rowCount; ++row) {
-        sContent.items.push(row);
-      }
-      blah.push(sContent);
-    }
-    console.log('blah: ', blah);
     return (
       <SafeAreaView style={{backgroundColor: 'gray', flex: 1}}>
         <View
           style={{backgroundColor: 'white', flex: 1}}
           onLayout={this._onLayout}>
-          <LargeList
+          {/* <LargeList
             style={styles.container}
-            data={blah}
-            heightForSection={() => 50}
-            renderSection={this._renderSection}
-            heightForIndexPath={() => 50}
+            data={[{items: DATA}]}
+            heightForIndexPath={() => HEIGHT}
             renderIndexPath={this._renderIndexPath}
-
             // ref={this.flatList}
             // extraData={this.state.height}
             // onLayout={this._onFlatListLayout}
@@ -251,15 +234,15 @@ export default class App extends Component {
             // showsHorizontalScrollIndicator={false}
             // renderItem={this._renderItem}
             // onViewableItemsChanged={this._onViewableItemsChanged}
-          />
-          {/* <FlatList
+          /> */}
+          <FlatList
             style={{flex: 1}}
             ref={this.flatList}
             extraData={this.state.height}
             onLayout={this._onFlatListLayout}
             scrollEnabled={this.state.flatListScrollEnabled}
-            onScrollEndDrag={() => this._onScrollEndDrag()}
             pagingEnabled={true}
+            nestedScrollEnabled={true}
             horizontal={false}
             onViewableItemsChanged={this._onIndexChanged}
             showsVerticalScrollIndicator={false}
@@ -267,7 +250,7 @@ export default class App extends Component {
             data={DATA}
             renderItem={this._renderItem}
             onViewableItemsChanged={this._onViewableItemsChanged}
-          /> */}
+          />
         </View>
       </SafeAreaView>
     );
