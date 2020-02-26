@@ -8,20 +8,20 @@
 
 import {
   Dimensions,
+  FlatList,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  FlatList,
   View,
 } from 'react-native';
 import React, {Component} from 'react';
 
 import {LargeList} from 'react-native-largelist-v3';
 import {LoremIpsum} from 'lorem-ipsum';
-import Toast from 'react-native-simple-toast';
 import NestedScrollView from 'react-native-nested-scroll-view';
-import { SpringScrollView } from 'react-native-spring-scrollview';
+import {SpringScrollView} from 'react-native-spring-scrollview';
+import Toast from 'react-native-simple-toast';
 
 const {HEIGHT, WIDTH} = Dimensions.get('window');
 
@@ -116,9 +116,9 @@ export default class App extends Component {
   };
 
   _onScroll = event => {
-    console.log('onscroll');
-    //const layoutHeight = event.nativeEvent.layoutMeasurement.height;
-    //const contentHeight = event.nativeEvent.contentSize.height;
+    console.log('onscroll', event.nativeEvent);
+    // const layoutHeight = event.nativeEvent.layoutMeasurement.height;
+    // const contentHeight = event.nativeEvent.contentSize.height;
 
     //console.log("Content offset:" + event.nativeEvent.contentOffset.y)
     //console.log("Content size:" + event.nativeEvent.contentSize.height)
@@ -140,7 +140,6 @@ export default class App extends Component {
     //console.log("Scroll Direction: " + scrollDirection)
     this.offset = currentOffset;
 
-    /*
     const detectMargin = 50;
     const atBottom =
       event.nativeEvent.layoutMeasurement.height +
@@ -151,7 +150,7 @@ export default class App extends Component {
     //if (atTop) console.log("atTop")
 
     // if at top and no change in direction
-    if ((atTop || atBottom) && currentOffset == this.offset) {
+    if ((atTop || atBottom) && currentOffset === this.offset) {
       console.log('if at top or bottom and no change in direction');
       this.setState({flatListScrollEnabled: true});
     }
@@ -167,27 +166,53 @@ export default class App extends Component {
     } else {
       this.setState({flatListScrollEnabled: false});
     }
-    */
   };
 
-  _renderItem = ({item, index, separators}) => {
+  _renderSpringItem = ({item, index, separators}) => {
     return (
       <SpringScrollView
         scrollEventThrottle={1}
         onScrollBeginDrag={event => {
           this._onScrollBegin(event);
         }}
-        onScroll={event => {
-          this._onScroll(event);
-        }}
+        onScroll={this._onScroll}
         height={this.state.height}>
         <View style={{padding: 50}}>
-          <Text style={{fontSize: 42, textAlign: 'center', paddingBottom: 16}}>
+          <Text
+            style={{
+              fontSize: 42,
+              textAlign: 'center',
+              paddingBottom: 16,
+            }}>
             {item.key}
           </Text>
           <Text style={{fontSize: 16, lineHeight: 30}}>{item.value}</Text>
         </View>
       </SpringScrollView>
+    );
+  };
+
+  _renderItem = ({item, index, separators}) => {
+    return (
+      <ScrollView
+        scrollEventThrottle={1}
+        onScrollBeginDrag={event => {
+          this._onScrollBegin(event);
+        }}
+        onScroll={this._onScroll}
+        height={this.state.height}>
+        <View style={{padding: 50}}>
+          <Text
+            style={{
+              fontSize: 42,
+              textAlign: 'center',
+              paddingBottom: 16,
+            }}>
+            {item.key}
+          </Text>
+          <Text style={{fontSize: 16, lineHeight: 30}}>{item.value}</Text>
+        </View>
+      </ScrollView>
     );
   };
 
@@ -202,7 +227,12 @@ export default class App extends Component {
     return (
       <NestedScrollView>
         <View style={{padding: 50}}>
-          <Text style={{fontSize: 42, textAlign: 'center', paddingBottom: 16}}>
+          <Text
+            style={{
+              fontSize: 42,
+              textAlign: 'center',
+              paddingBottom: 16,
+            }}>
             {DATA[row].key}
           </Text>
           <Text style={{fontSize: 16, lineHeight: 30}}>{DATA[row].value}</Text>
@@ -241,7 +271,7 @@ export default class App extends Component {
             extraData={this.state.height}
             onLayout={this._onFlatListLayout}
             scrollEnabled={this.state.flatListScrollEnabled}
-            pagingEnabled={true}
+            // pagingEnabled={true}
             nestedScrollEnabled={true}
             horizontal={false}
             onViewableItemsChanged={this._onIndexChanged}
