@@ -17,11 +17,10 @@ import {
 } from 'react-native';
 import React, {Component} from 'react';
 
-import {LargeList} from 'react-native-largelist-v3';
 import {LoremIpsum} from 'lorem-ipsum';
-import NestedScrollView from 'react-native-nested-scroll-view';
 import {SpringScrollView} from 'react-native-spring-scrollview';
 import Toast from 'react-native-simple-toast';
+import InfiniteScroll from './InfiniteScroll';
 
 const {HEIGHT, WIDTH} = Dimensions.get('window');
 
@@ -116,7 +115,7 @@ export default class App extends Component {
   };
 
   _onScroll = event => {
-    console.log('onscroll', event.nativeEvent);
+    //console.log('onscroll', event.nativeEvent);
     // const layoutHeight = event.nativeEvent.layoutMeasurement.height;
     // const contentHeight = event.nativeEvent.contentSize.height;
 
@@ -225,7 +224,7 @@ export default class App extends Component {
 
   _renderIndexPath = ({section: section, row: row}) => {
     return (
-      <NestedScrollView>
+      <ScrollView>
         <View style={{padding: 50}}>
           <Text
             style={{
@@ -237,51 +236,24 @@ export default class App extends Component {
           </Text>
           <Text style={{fontSize: 16, lineHeight: 30}}>{DATA[row].value}</Text>
         </View>
-      </NestedScrollView>
+      </ScrollView>
     );
+  };
+
+  _onPanGestureEvent = (event: PanGestureHandlerGestureEvent) => {
+    console.log(event.nativeEvent);
+    console.log(this.flatList)
+    this.flatList.scrollToOffset({
+      x: 0,
+      y: event.nativeEvent.translationY,
+      animated: true,
+    });
   };
 
   render() {
     return (
       <SafeAreaView style={{backgroundColor: 'gray', flex: 1}}>
-        <View
-          style={{backgroundColor: 'white', flex: 1}}
-          onLayout={this._onLayout}>
-          {/* <LargeList
-            style={styles.container}
-            data={[{items: DATA}]}
-            heightForIndexPath={() => HEIGHT}
-            renderIndexPath={this._renderIndexPath}
-            // ref={this.flatList}
-            // extraData={this.state.height}
-            // onLayout={this._onFlatListLayout}
-            // scrollEnabled={this.state.flatListScrollEnabled}
-            // onScrollEndDrag={() => this._onScrollEndDrag()}
-            // pagingEnabled={true}
-            // horizontal={false}
-            // onViewableItemsChanged={this._onIndexChanged}
-            // showsVerticalScrollIndicator={false}
-            // showsHorizontalScrollIndicator={false}
-            // renderItem={this._renderItem}
-            // onViewableItemsChanged={this._onViewableItemsChanged}
-          /> */}
-          <FlatList
-            style={{flex: 1}}
-            ref={this.flatList}
-            extraData={this.state.height}
-            onLayout={this._onFlatListLayout}
-            scrollEnabled={this.state.flatListScrollEnabled}
-            // pagingEnabled={true}
-            nestedScrollEnabled={true}
-            horizontal={false}
-            onViewableItemsChanged={this._onIndexChanged}
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-            data={DATA}
-            renderItem={this._renderItem}
-            onViewableItemsChanged={this._onViewableItemsChanged}
-          />
-        </View>
+        <InfiniteScroll />
       </SafeAreaView>
     );
   }
